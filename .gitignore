@@ -5,3 +5,4 @@ __pycache__/
 credentials.txt
 chromedriver-linux64/
 *.jpeg
+*.code-workspace
