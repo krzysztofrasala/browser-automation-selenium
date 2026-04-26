@@ -1,4 +1,5 @@
-import os 
+import os
+import time
 from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -6,69 +7,82 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
-# Load credentials from .env
-load_dotenv()
+class WebAutomation:
+    def __init__(self):
+        load_dotenv()
+        self.user = os.getenv('user')
+        self.password = os.getenv('password')
+        
+        self.chrome_options = Options()
+        self.chrome_options.add_argument("--disable-search-engine-choice-screen")
+        # Added to ignore minor SSL/certificate issues
+        self.chrome_options.add_argument("--ignore-certificate-errors")
+        
+        download_path = os.getcwd()
+        prefs = {'download.default_directory': download_path}
+        self.chrome_options.add_experimental_option('prefs', prefs)
+        
+        self.driver = webdriver.Chrome(options=self.chrome_options)
+        # Increased wait time to 15 seconds for slower connections/ads
+        self.wait = WebDriverWait(self.driver, 15)
 
-user = os.getenv('user')
-password = os.getenv('password')
+    def login(self):
+        print("Logging in...")
+        self.driver.get('https://demoqa.com/login')
+        
+        user_field = self.wait.until(EC.element_to_be_clickable((By.ID, 'userName')))
+        pass_field = self.driver.find_element(By.ID, 'password')
+        login_btn = self.driver.find_element(By.ID, 'login')
 
-# Define options
-chrome_options = Options()
-chrome_options.add_argument("--disable-search-engine-choice-screen")
+        user_field.send_keys(self.user)
+        pass_field.send_keys(self.password)
+        self.driver.execute_script("arguments[0].click();", login_btn)
 
-# Set default download directory to current working directory
-download_path = os.getcwd()
-prefs = {'download.default_directory': download_path}
-chrome_options.add_experimental_option('prefs', prefs)
+    def fill_text_box_form(self, name, email, current_addr, perm_addr):
+        print("Filling out the Text Box form...")
+        
+        # Click Elements using JS to bypass overlays
+        elements_menu = self.wait.until(EC.presence_of_element_located((By.XPATH, "//*[text()='Elements']")))
+        self.driver.execute_script("arguments[0].scrollIntoView();", elements_menu)
+        self.driver.execute_script("arguments[0].click();", elements_menu)
+        
+        # Click Text Box
+        text_box_btn = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='Text Box']")))
+        self.driver.execute_script("arguments[0].click();", text_box_btn)
 
-# Initialize the driver - Selenium automatically manages the ChromeDriver now!
-driver = webdriver.Chrome(options=chrome_options)
+        # Fill fields
+        self.wait.until(EC.visibility_of_element_located((By.ID, 'userName'))).send_keys(name)
+        self.driver.find_element(By.ID, 'userEmail').send_keys(email)
+        self.driver.find_element(By.ID, 'currentAddress').send_keys(current_addr)
+        self.driver.find_element(By.ID, 'permanentAddress').send_keys(perm_addr)
 
-try:
-    # Load the webpage
-    driver.get('https://demoqa.com/login')
+        submit_btn = self.driver.find_element(By.ID, 'submit')
+        self.driver.execute_script("arguments[0].scrollIntoView();", submit_btn)
+        self.driver.execute_script("arguments[0].click();", submit_btn)
 
-    # Locate username, password and login button
-    username_field = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'userName')))
-    password_field = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'password')))
-    login_button = driver.find_element(By.ID, 'login')
+    def download_file(self):
+        print("Downloading file...")
+        # Finding the 'Upload and Download' item in the sidebar
+        # Using a more specific selector to avoid mistakes
+        upload_item = self.wait.until(EC.presence_of_element_located((By.XPATH, "//span[text()='Upload and Download']")))
+        self.driver.execute_script("arguments[0].scrollIntoView();", upload_item)
+        self.driver.execute_script("arguments[0].click();", upload_item)
+        
+        # Wait for download button and click it
+        download_btn = self.wait.until(EC.element_to_be_clickable((By.ID, 'downloadButton')))
+        self.driver.execute_script("arguments[0].click();", download_btn)
+        
+        # Small sleep to let the browser start the download before closing
+        time.sleep(2) 
 
-    # Fill in username and password
-    username_field.send_keys(user)
-    password_field.send_keys(password) 
-    driver.execute_script("arguments[0].click();", login_button)
-
-    # Locate the Elements dropdown and Text Box
-    elements = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//*[text()='Elements']")))
-    driver.execute_script("arguments[0].click();", elements)
-
-    text_box = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//*[text()='Text Box']")))
-    driver.execute_script("arguments[0].click();", text_box)
-
-    # Locate the form fields and sumbit button 
-    fullname_field = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'userName')))
-    email_field = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'userEmail')))
-    current_address_field = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'currentAddress')))
-    permanent_address_field = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'permanentAddress')))
-    submit_button = driver.find_element(By.ID, 'submit')
-
-    # Fill in the form fields
-    fullname_field.send_keys('John Smith')
-    email_field.send_keys('john@gmail.com')
-    current_address_field.send_keys('Rondo Daszynskiego 1, Warsaw, Poland')
-    permanent_address_field.send_keys('John Street 1, Warsaw, Poland')
-
-    driver.execute_script("arguments[0].scrollIntoView();", submit_button)
-    driver.execute_script("arguments[0].click();", submit_button)
-
-    # Locate the Upload and Download section and the Download button
-    upload_download = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'item-7')))
-    upload_download.click()
-    download_button = driver.find_element(By.ID, 'downloadButton')
-    driver.execute_script("arguments[0].click();", download_button)
-
-    print("The script executed successfully!")
-
-finally:
-    input("Press Enter to close the browser...")
-    driver.quit()
+    def run(self, name='John Doe', email='john@example.com', c_addr='Addr 1', p_addr='Addr 2'):
+        try:
+            self.login()
+            self.fill_text_box_form(name, email, c_addr, p_addr)
+            self.download_file()
+            print("Finished!")
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            # Removed the input() to prevent terminal hanging
+            self.driver.quit()
