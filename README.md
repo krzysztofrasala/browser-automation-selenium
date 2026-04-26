@@ -1,51 +1,33 @@
-# Browser Automation with Selenium - DemoQA
+# Web Automation Bot 🚀
 
-A training project focused on web browser automation using Python and Selenium. The script automates the process of logging in, filling out forms, and downloading files on the DemoQA platform.
+Professional Selenium automation with a Tkinter GUI for DemoQA. Refactored into clean OOP structure.
 
-## 🚀 Features
+## 🛠 Features
+- **OOP Design**: Logic encapsulated in `WebAutomation` class.
+- **Tkinter GUI**: Simple interface for data entry.
+- **Reliable Locators**: Uses JS clicks and Explicit Waits to bypass ads.
+- **Process**: Auto-login -> Form Fill -> File Download.
 
-* **Automated Login:** Secure login process using environment variables.
-* **Form Handling:** Automatic completion of text fields (Full Name, Email, Addresses).
-* **UI Interactions:** Page scrolling and handling dynamic elements using WebDriverWait.
-* **File Download:** Navigating to the Upload/Download section and triggering a file download to the local directory.
+## ⚙️ Setup
+1. **Install Dependencies**:
+   ```bash
+   pip install selenium python-dotenv
+   ```
+2. **Environment Variables**: Create a `.env` file:
+   ```env
+   user=your_username
+   password=your_password
+   ```
 
-## 🛠️ Technologies
+## 🚀 How to Run
+```bash
+python gui.py
+```
 
-* **Python 3.x**
-* **Selenium WebDriver** - Automation engine.
-* **python-dotenv** - Secure credential management.
-* **ChromeDriver** - Driver for Chrome browser.
+## 📂 Project Structure
+- `main.py` - Core automation logic (Class-based).
+- `gui.py` - Tkinter interface.
+- `.env` - Private credentials (ignored by git).
 
-## 📋 Installation
-
-1. **Clone the repository:**
-
-       git clone [https://github.com/krzysztofrasala/browser-automation-selenium.git](https://github.com/krzysztofrasala/browser-automation-selenium.git)
-       cd browser-automation-selenium
-
-2. **Create and activate a virtual environment:**
-
-       python3 -m venv .venv
-       source .venv/bin/activate
-
-3. **Install dependencies:**
-
-       pip install -r requirements.txt
-
-## 🔐 Security Configuration
-
-This project uses a .env file to store login credentials. This file is excluded from version control (defined in .gitignore) to prevent passwords from being exposed online.
-
-1. Create a .env file in the root directory.
-2. Add your credentials as follows:
-
-       user=your_username
-       password=your_secret_password
-
-## 🏁 How to Run
-
-1. Ensure you have Google Chrome installed.
-2. Ensure the chromedriver path in main.py matches your local setup.
-3. Run the script:
-
-       python main.py
+---
+*Created for browser automation testing.*
